@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const fs = require('fs/promises');
 const generateToken = require('./generateToken');
 
+
+
 const app = express();
 app.use(bodyParser.json());
 
@@ -51,7 +53,13 @@ app.get('/talker/:id', async (req, res) => {
   }
 });
 
-app.post('/login', (_req, res) => {
+const valEmail = require('./middlewares/valEmail');
+const valPass = require('./middlewares/valPass');
+
+app.post('/login', 
+  valPass,
+  valEmail,
+  (_req, res) => {
   try {
     const token = generateToken();
 
