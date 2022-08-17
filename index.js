@@ -9,7 +9,7 @@ app.use(bodyParser.json());
 const getTalkerData = async () => {
   const arrayTalkers = await fs.readFile('./talker.json', 'utf-8');
   return JSON.parse(arrayTalkers);
-}
+};
 
 const HTTP_OK_STATUS = 200;
 const PORT = '3000';
@@ -31,4 +31,3 @@ app.get('/talker', async (req, res) => {
     return res.status(500).end();
   }
 });
-
