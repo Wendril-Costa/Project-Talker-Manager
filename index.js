@@ -3,6 +3,15 @@ const bodyParser = require('body-parser');
 const fs = require('fs/promises');
 const generateToken = require('./generateToken');
 
+const valEmail = require('./middlewares/valEmail');
+const valPass = require('./middlewares/valPass');
+const valToken = require('./middlewares/valToken');
+const valName = require('./middlewares/valName');
+const valAge = require('./middlewares/valAge');
+const valTalk = require('./middlewares/valTalk');
+const valWatchedAt = require('./middlewares/valWatchedAt');
+const valRate = require('./middlewares/valRate');
+
 const app = express();
 app.use(bodyParser.json());
 
@@ -11,10 +20,15 @@ const getTalkerData = async () => {
   return JSON.parse(arrayTalkers);
 };
 
+function setTalkerData(newTalkerData) {
+  return fs.writeFile('./talker.json', JSON.stringify(newTalkerData));
+}
+
 const HTTP_OK_STATUS = 200;
 const PORT = '3000';
 const PAGE_NOT_FOUND = 404;
 const INTERNAL_SERVER_ERROR = 500;
+const CREATED = 201;
 
 app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
@@ -51,9 +65,6 @@ app.get('/talker/:id', async (req, res) => {
   }
 });
 
-const valEmail = require('./middlewares/valEmail');
-const valPass = require('./middlewares/valPass');
-
 app.post('/login', 
   valPass,
   valEmail,
@@ -62,6 +73,33 @@ app.post('/login',
     const token = generateToken();
 
     return res.status(HTTP_OK_STATUS).json({ token });
+  } catch (error) {
+    return res.status(INTERNAL_SERVER_ERROR).end();
+  }
+});
+
+app.post('/talker', 
+  valToken,
+  valName,
+  valAge,
+  valTalk,
+  valWatchedAt,
+  valRate,
+  async (req, res) => {
+  try {
+    const arrayTalkers = await getTalkerData();
+    const { name, age, talk: { watchedAt, rate } } = req.body;
+    
+    const getId = (arrayTalkers[arrayTalkers.length - 1]);
+    const { id } = getId;
+
+    const addId = id + 1;
+    const newTalker = { id: addId, name, age, talk: { watchedAt, rate } };
+
+    arrayTalkers.push(newTalker);
+    await setTalkerData(arrayTalkers);
+
+    return res.status(CREATED).json(newTalker);
   } catch (error) {
     return res.status(INTERNAL_SERVER_ERROR).end();
   }
