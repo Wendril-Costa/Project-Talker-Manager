@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs/promises');
+const generateToken = require('./generateToken');
 
 const app = express();
 app.use(bodyParser.json());
@@ -23,7 +24,7 @@ app.listen(PORT, () => {
   console.log('Online');
 });
 
-app.get('/talker', async (req, res) => {
+app.get('/talker', async (_req, res) => {
   try {
     const arrayTalkers = await getTalkerData();
 
@@ -45,6 +46,16 @@ app.get('/talker/:id', async (req, res) => {
     }
 
     return res.status(HTTP_OK_STATUS).json(talker);
+  } catch (error) {
+    return res.status(INTERNAL_SERVER_ERROR).end();
+  }
+});
+
+app.post('/login', (_req, res) => {
+  try {
+    const token = generateToken();
+
+    return res.status(HTTP_OK_STATUS).json({ token });
   } catch (error) {
     return res.status(INTERNAL_SERVER_ERROR).end();
   }
