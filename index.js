@@ -49,6 +49,20 @@ app.get('/talker', async (_req, res) => {
   }
 });
 
+app.get('/talker/search', 
+  valToken,
+  async (req, res) => {
+  try {  
+  const arrayTalkers = await getTalkerData();
+  const { q } = req.query;
+  const filterTalker = arrayTalkers.filter((t) => t.name.includes(q));
+
+  return res.status(HTTP_OK_STATUS).json(filterTalker);
+  } catch (error) {
+    return res.status(INTERNAL_SERVER_ERROR).end(); 
+  }
+});
+
 app.get('/talker/:id', async (req, res) => {
   try {
     const arrayTalkers = await getTalkerData();
