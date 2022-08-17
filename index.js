@@ -29,6 +29,7 @@ const PORT = '3000';
 const PAGE_NOT_FOUND = 404;
 const INTERNAL_SERVER_ERROR = 500;
 const CREATED = 201;
+const NO_CONTENT = 204;
 
 app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
@@ -118,7 +119,7 @@ app.put('/talker/:id',
     const { id } = req.params;
     const { name, age, talk: { watchedAt, rate } } = req.body;
     const typeNumber = Number(id);
-    const index = arrayTalkers.findIndex((r) => r.id === typeNumber);
+    const index = arrayTalkers.findIndex((t) => t.id === typeNumber);
     arrayTalkers[index] = { 
       id: typeNumber,
       name, 
@@ -128,6 +129,21 @@ app.put('/talker/:id',
     
     await setTalkerData(arrayTalkers);
     return res.status(HTTP_OK_STATUS).json(arrayTalkers[index]);
+  } catch (error) {
+    return res.status(INTERNAL_SERVER_ERROR).end();
+  }
+});
+
+app.delete('/talker/:id', 
+  valToken,
+  async (req, res) => {
+  try {
+    const arrayTalkers = await getTalkerData();
+    const { id } = req.params;
+    const newArray = arrayTalkers.filter((t) => t.id !== Number(id));
+
+    await setTalkerData(newArray);
+    return res.status(NO_CONTENT).end();
   } catch (error) {
     return res.status(INTERNAL_SERVER_ERROR).end();
   }
