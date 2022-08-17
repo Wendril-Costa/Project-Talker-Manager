@@ -3,8 +3,6 @@ const bodyParser = require('body-parser');
 const fs = require('fs/promises');
 const generateToken = require('./generateToken');
 
-
-
 const app = express();
 app.use(bodyParser.json());
 
