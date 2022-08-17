@@ -104,3 +104,31 @@ app.post('/talker',
     return res.status(INTERNAL_SERVER_ERROR).end();
   }
 });
+
+app.put('/talker/:id', 
+  valToken,
+  valName,
+  valAge,
+  valTalk,
+  valWatchedAt,
+  valRate,
+  async (req, res) => {
+  try {
+    const arrayTalkers = await getTalkerData();
+    const { id } = req.params;
+    const { name, age, talk: { watchedAt, rate } } = req.body;
+    const typeNumber = Number(id);
+    const index = arrayTalkers.findIndex((r) => r.id === typeNumber);
+    arrayTalkers[index] = { 
+      id: typeNumber,
+      name, 
+      age, 
+      talk: { watchedAt, rate }, 
+    };
+    
+    await setTalkerData(arrayTalkers);
+    return res.status(HTTP_OK_STATUS).json(arrayTalkers[index]);
+  } catch (error) {
+    return res.status(INTERNAL_SERVER_ERROR).end();
+  }
+});
